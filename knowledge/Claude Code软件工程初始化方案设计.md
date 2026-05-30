@@ -403,6 +403,7 @@ pipeline(files, review, fix, verify)
 | 10 | `curl *` 权限过宽 | 允许任意网络请求 | 限制 localhost + api.deepseek.com | 网络权限限制端点和域名 |
 | 11 | `matcher: "Bash"` + `if` 条件导致所有 Bash 被误拦截 | `if` 条件在 `matcher` 为纯字母时被忽略；`matcher` 含空格/特殊字符时自动变为正则匹配 | 用 `matcher: "git push.*main"` 直接正则匹配，去掉 `if` | 官方文档明确：matcher 纯字母=工具名精确匹配，含特殊字符=正则匹配命令内容 |
 | 12 | `PostToolUse` 用 `matcher: "Edit\|Write"` + `if` 组合不可靠 | `\|` 属于「工具名」字符集，`if` 可能被忽略；`Edit\|Write` 在工具名模式下含义不明确（是字面量还是 OR？） | 拆分为两个独立 Hook 条目，一个 `matcher: "Edit"`，一个 `matcher: "Write"`，去掉 `if` | PostToolUse 同样适用避坑 #11 规则：不要同时使用 matcher + if。当 ruff 安装后，文件过滤逻辑需要重新设计 |
+| 13 | L3 `Bash(*)` 覆盖 L2 全部安全模型 | 部署时为避免权限弹窗临时加入，事后忘记移除；L3 Allow 优先级覆盖 L2 的精细控制 | 移除 `Bash(*)` 及所有部署临时 Bash 权限，L3 仅保留 `WebSearch` + `WebFetch` 域限制 | L3 应该是「个人偏好覆盖」而非「安全模型绕过」。任何 Bash 权限变更应在 L2 统一管理 |
 
 ---
 
@@ -436,8 +437,17 @@ pipeline(files, review, fix, verify)
 | 规则-强制映射表 | `knowledge/规则强制执行映射表.md` |
 | 知识反馈闭环协议 | `knowledge/知识反馈闭环协议.md` |
 | 知识审查协议 | `knowledge/知识审查协议.md` |
-| 避坑汇总 | `knowledge/避坑汇总.md` |
+| 避坑汇总（12 条） | `knowledge/避坑汇总.md` |
 | 路径规则（5 个） | `.claude/rules/python.md, api.md, database.md, security.md, testing.md` |
+
+### 验证工具 → `scripts/`
+
+| 脚本 | 检查项 | 用途 |
+|------|:--:|------|
+| `audit_v4.1.py` | 610 | 静态审计：逐文件存在性 + JSON 有效性 + 内容完整性 + 跨文件一致性 |
+| `func_test_v4.1.py` | 50 | 功能测试：Allow/Deny 权限 + Hook 结构 + Git 保护 + 知识库引用 + L3 安全 |
+
+运行方式：`python3 scripts/audit_v4.1.py && python3 scripts/func_test_v4.1.py`
 
 ### 操作入口
 
@@ -446,6 +456,7 @@ pipeline(files, review, fix, verify)
 - **修改项目规则** → 编辑 `config/L2/CLAUDE.md` → `cp` 到 `./CLAUDE.md`
 - **查阅规范** → `knowledge/README.md` → 对应分类
 - **理解设计** → 本文档
+- **验证部署** → `python3 scripts/audit_v4.1.py && python3 scripts/func_test_v4.1.py`
 
 ---
 
@@ -458,5 +469,6 @@ pipeline(files, review, fix, verify)
 | v3.0 | 2026-05-30 | 完整操作手册（1314 行，源码+部署+验证） |
 | v4.0 | 2026-05-30 | 设计/实现分离（293 行设计 + config/ 模板） |
 | v4.1 | 2026-05-30 | 🔒 锁定版本：6 补足 + 子代理策略 + 四层知识库 + L2 模块化规则（425 行） |
+| v4.1.1 | 2026-05-30 | 🔧 安装审计：6 问题修复 + 659 项验证 100% 通过 + 避坑 13 条 + 审计脚本 |
 
 > 📐 本文档解决「为什么这样设计」。🔧 配置模板和部署命令参见 `config/`。📚 软工规范参见 `knowledge/`。🚀 一键部署参见 `deploy/`。

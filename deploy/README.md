@@ -86,6 +86,9 @@ mkdir -p ~/.claude/projects/D--panzt-projects-claude-code-python-rag/memory/
 3. 验证 Hook：尝试 `rm -rf /tmp/test` 应被阻止
 4. 验证知识库：`@knowledge/README.md` 应可引用
 5. 编辑 `src/api/` 下的 .py 文件，验证 api.md 规则自动注入
+6. 运行审计脚本：`python3 scripts/audit_v4.1.py && python3 scripts/func_test_v4.1.py`
+   - audit_v4.1.py: 610 项静态审计，通过率应 = 100%
+   - func_test_v4.1.py: 50 项功能测试，通过率应 = 100%
 
 ## 故障排查
 
@@ -96,3 +99,5 @@ mkdir -p ~/.claude/projects/D--panzt-projects-claude-code-python-rag/memory/
 | **所有 Bash 被误拦截** | `matcher: "Bash"` + `if` 条件组合失效 | 改用 `matcher: "git push.*main"`（含空格=正则），去掉 `if` 字段 |
 | 知识库 @ 引用失败 | knowledge/ 目录缺失 | 确认 `knowledge/` 目录存在 |
 | 路径规则不注入 | rules/ 未部署 | 检查 `.claude/rules/` 目录 |
+| **所有 Bash 命令均可执行** | L3 中存在 `Bash(*)` 权限 | 检查 `.claude/settings.local.json`，移除 `Bash(*)`。L3 不应有 Bash 通配权限 |
+| 审计脚本报错 | Python 编码/路径问题 | `PYTHONIOENCODING=utf-8 python3 scripts/audit_v4.1.py` |

@@ -122,6 +122,7 @@ cp config/L3-项目本地/CLAUDE.local.md ./CLAUDE.local.md
 - [ ] L1 引用：`@~/.claude/knowledge/06-安全规范/03-密钥与认证管理.md`
 - [ ] L2 规范引用：`knowledge/01-Token成本优化/01-Prompt缓存策略.md`
 - [ ] L2 路径规则：编辑 `src/api/` 下的文件时 api.md 规则自动生效
+- [ ] 运行审计验证：`python3 scripts/audit_v4.1.py && python3 scripts/func_test_v4.1.py`
 
 ## 目录结构总览
 
@@ -130,6 +131,10 @@ cp config/L3-项目本地/CLAUDE.local.md ./CLAUDE.local.md
 ├── config/                     ← 配置源
 │   ├── README.md               ← 本手册
 │   ├── L0~L3/                  ← 四层模板
+│
+├── scripts/                    ← 验证工具
+│   ├── audit_v4.1.py           ← 静态审计 (610 检查项)
+│   └── func_test_v4.1.py       ← 功能测试 (50 测试项)
 │
 ├── CLAUDE.md                   ← L2 项目指令
 ├── CLAUDE.local.md             ← L3 个人指令
@@ -142,8 +147,16 @@ cp config/L3-项目本地/CLAUDE.local.md ./CLAUDE.local.md
 │
 ├── knowledge/                  ← 规范 + 管理文档
 │   ├── README.md
-│   ├── 01~10/ (75 规范)
-│   └── 项目管理/ (8 文档)
+│   ├── 01~10/ (82 规范)
+│   └── 项目管理/ (7 文档)
 │
-├── .gitignore / .env.example / pyproject.toml / .mcp.json
+├── docs/                       ← 部署文档
+│   ├── 部署清单-v4.1.md
+│   └── 部署验证清单-v4.1.md
+│
+├── deploy/                     ← 一键部署脚本
+│   ├── install.sh / install.ps1 / install.bat
+│   └── README.md
+│
+├── .gitignore / .claudeignore / .env.example
 ```

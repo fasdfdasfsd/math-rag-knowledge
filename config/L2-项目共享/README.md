@@ -93,3 +93,9 @@ mkdir -p ~/.claude/projects/D--panzt-projects-claude-code-python-rag/memory/
 # 编辑 src/api/ 下的文件 → api.md 规则自动生效
 # 编辑 tests/ 下的文件 → testing.md 规则自动生效
 ```
+
+验证部署完整性：
+```bash
+python3 scripts/audit_v4.1.py && python3 scripts/func_test_v4.1.py
+# 预期: 659/659 检查项通过
+```
