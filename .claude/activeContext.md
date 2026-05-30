@@ -1,25 +1,25 @@
 # activeContext.md — 当前任务状态
 
 > 最后更新: 2026-05-30
-> 状态: 安装审计完成，6 项修复已应用
+> 状态: v4.1 安全加固 + Git 初始化完成
 
 ## 当前阶段
-**配置工程化优化 — v4.1 安装审计 + 修复**
+**配置工程化 — 安全审计 + 修复完成**
 
-## 已完成（本轮审计）
-- [x] 安装过程模拟审计 → 发现 6 个问题
-- [x] #1 方案 §四：Hook 7→9（补充 Notification ×2 设计意图）
-- [x] #2 config/README.md：8→9 Hooks
-- [x] #3 config/L2/README.md：8→9 Hooks，66→82 knowledge 文件
-- [x] #4 创建 .gitignore（保护 L3 文件 + 密钥 + Python 标准忽略）
-- [x] #5 创建 config/L2/.claudeignore 模板 + 部署脚本自动修复
-- [x] #6 PostToolUse matcher 修复（`Edit|Write`+`if` → 拆分为两个独立条目）
-- [x] 避坑 #12 归档到方案文档
-- [x] 部署脚本更新（install.sh + install.ps1 支持 .claudeignore 自动修复）
-- [x] 实施索引更新（新增 .gitignore + .claudeignore 条目）
+## 已完成（本轮安全加固）
+- [x] L3 Bash(*) 安全漏洞修复（移除，恢复 L2 精细权限控制）
+- [x] Git 仓库初始化（115 文件，2 次提交）
+- [x] .gitignore 生效验证（L3 文件正确排除）
+- [x] .gitignore 修复（`CLAUDE.local.md` → `/CLAUDE.local.md`，防止误伤 config/L3 模板）
+- [x] config/L3 模板文件补提交（之前被错误排除）
+- [x] 冗余备份文件已确认删除
+- [x] 重新安全审计：L2 14 条精细 Bash 权限 vs L3 的 Bash(*) 覆盖分析
+
+## 待手动处理
+- [ ] 清理测试文件：`src/api/test_verify.py`、`tests/test_verify.py`（rm 命令被 Deny 阻止）
 
 ## 阻塞项
 无
 
 ## 下一步
-等待用户确认 → 继续审计其他方面或开始新任务
+等待用户新任务
