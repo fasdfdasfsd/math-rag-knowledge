@@ -1,0 +1,46 @@
+# ============================================================
+# python-rag .gitignore
+# 保护 L3 本地文件 + 密钥 + 标准忽略
+# ============================================================
+
+# === L3 项目本地（个人配置，禁止提交）===
+CLAUDE.local.md
+.claude/settings.local.json
+
+# === 密钥与凭证 ===
+.env
+.env.*
+*.pem
+*.key
+secrets/
+credentials.*
+*.cred
+
+# === Python ===
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+
+# === 测试产物 ===
+.pytest_cache/
+htmlcov/
+.coverage
+.tox/
+*.sqlite3
+*.db
+
+# === IDE ===
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# === 会话 ===
+.claude/.last-session-exit

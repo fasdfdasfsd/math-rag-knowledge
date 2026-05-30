@@ -1,0 +1,47 @@
+# Claude Code Token 优化忽略文件
+# 这些目录/文件不会被送入上下文窗口
+
+# 构建产物
+dist/
+build/
+*.whl
+*.egg-info/
+__pycache__/
+*.pyc
+*.pyo
+
+# 依赖
+node_modules/
+.venv/
+venv/
+
+# 版本控制
+.git/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 数据文件
+data/
+*.db
+*.sqlite3
+*.bin
+*.pkl
+
+# 锁文件
+*.lock
+package-lock.json
+yarn.lock
+
+# 测试产物
+.pytest_cache/
+htmlcov/
+.coverage
+.tox/
+
+# 系统
+.DS_Store
+Thumbs.db

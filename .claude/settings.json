@@ -1,0 +1,120 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git *)",
+      "Bash(uv *)",
+      "Bash(python -m pytest *)",
+      "Bash(python -m ruff *)",
+      "Bash(python -m mypy *)",
+      "Bash(python deploy.py *)",
+      "Bash(mkdir *)",
+      "Bash(ls *)",
+      "Bash(cat *)",
+      "Bash(find *)",
+      "Bash(echo *)",
+      "Bash(wc *)",
+      "Bash(curl http://localhost:*)",
+      "Bash(curl https://api.deepseek.com:*)",
+      "Read(**)"
+    ],
+    "deny": [
+      "Bash(rm -rf *)",
+      "Bash(git push --force *)",
+      "Bash(git push origin main)",
+      "Bash(git push origin master)",
+      "Bash(dropdb *)",
+      "Read(**/*.env)",
+      "Read(**/*.pem)",
+      "Read(**/*.key)",
+      "Read(**/secrets/**)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "rm -rf",
+        "hooks": [{
+          "type": "command",
+          "command": "echo '{\"decision\":\"block\",\"reason\":\"禁止递归强制删除\"}' && exit 2"
+        }]
+      },
+      {
+        "matcher": "git push.*main",
+        "hooks": [{
+          "type": "command",
+          "command": "echo '{\"decision\":\"block\",\"reason\":\"禁止直接推送 main 分支\"}' && exit 2"
+        }]
+      },
+      {
+        "matcher": "git push.*master",
+        "hooks": [{
+          "type": "command",
+          "command": "echo '{\"decision\":\"block\",\"reason\":\"禁止直接推送 master 分支\"}' && exit 2"
+        }]
+      },
+      {
+        "matcher": "git commit",
+        "hooks": [{
+          "type": "command",
+          "command": "echo '[质量门禁] 建议提交前执行: ruff check . && python -m pytest --cov=src && echo 通过' && exit 0"
+        }]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit",
+        "hooks": [{
+          "type": "command",
+          "command": "echo '[自动格式化] 跳过（ruff 未安装在当前环境）' && exit 0"
+        }]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [{
+          "type": "command",
+          "command": "echo '[自动格式化] 跳过（ruff 未安装在当前环境）' && exit 0"
+        }]
+      }
+    ],
+    "Notification": [
+      {
+        "matcher": "permission_prompt",
+        "hooks": [{
+          "type": "command",
+          "command": "echo '[Claude Code] 需要你的许可确认' && exit 0"
+        }]
+      },
+      {
+        "matcher": "idle_prompt",
+        "hooks": [{
+          "type": "command",
+          "command": "echo '[Claude Code] 等待你的输入' && exit 0"
+        }]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [{
+          "type": "command",
+          "command": "date -Iseconds 2>/dev/null > .claude/.last-session-exit 2>/dev/null; date +%Y-%m-%dT%H:%M:%S 2>/dev/null > .claude/.last-session-exit 2>/dev/null; echo '═══ 会话结束检查 ═══' && changed=$(git diff --name-only HEAD 2>/dev/null | wc -l) && [ \"$changed\" -gt 0 ] && echo \"📝 未提交变更: $changed 个文件\" || echo '✅ 无未提交变更' && echo '[记忆提醒] 请更新: MEMORY.md / activeContext.md / primer.md' && exit 0"
+        }]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [{
+          "type": "command",
+          "command": "echo '[PreCompact] 请保存关键信息到 MEMORY.md' && exit 0"
+        }]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [{
+          "type": "command",
+          "command": "echo '═══ 记忆文件状态 ═══' && for f in .claude/MEMORY.md .claude/primer.md .claude/activeContext.md CLAUDE.md; do [ -f \"$f\" ] && echo \"✅ $f\" || echo \"❌ $f (缺失)\"; done && echo '' && echo '═══ 项目健康检查 ═══' && [ -f .claude/.last-session-exit ] && echo '📅 上次退出: '$(cat .claude/.last-session-exit 2>/dev/null || echo 未知) || echo '⚠️ 未找到退出记录（可能异常退出）' && [ -f .pytest_cache/v/cache/lastfailed ] && echo '🧪 测试: ⚠️ 上次有失败用例' || echo '🧪 测试: 无失败缓存' && grep -c '避坑' .claude/MEMORY.md 2>/dev/null >/dev/null && echo '📝 避坑: MEMORY.md 中有未归类经验' || echo '📝 避坑: 无新增' && echo '══════════════════' && exit 0"
+        }]
+      }
+    ]
+  }
+}
