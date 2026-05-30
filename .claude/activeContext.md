@@ -1,25 +1,29 @@
 # activeContext.md — 当前任务状态
 
 > 最后更新: 2026-05-30
-> 状态: v4.1 安全加固 + Git 初始化完成
+> 状态: v4.1 完全验证 + v4.2 规划完成，待用户确认后安装
 
 ## 当前阶段
-**配置工程化 — 安全审计 + 修复完成**
+**等待确认 — v4.2 必选扩展清单已输出**
 
-## 已完成（本轮安全加固）
-- [x] L3 Bash(*) 安全漏洞修复（移除，恢复 L2 精细权限控制）
-- [x] Git 仓库初始化（115 文件，2 次提交）
-- [x] .gitignore 生效验证（L3 文件正确排除）
-- [x] .gitignore 修复（`CLAUDE.local.md` → `/CLAUDE.local.md`，防止误伤 config/L3 模板）
-- [x] config/L3 模板文件补提交（之前被错误排除）
-- [x] 冗余备份文件已确认删除
-- [x] 重新安全审计：L2 14 条精细 Bash 权限 vs L3 的 Bash(*) 覆盖分析
+## 已完成
+- [x] v4.1 安装审计（6 问题修复）
+- [x] L3 Bash(*) 安全漏洞修复
+- [x] Git 初始化 + .gitignore 修复
+- [x] 自动化审计脚本（659/659 通过）
+- [x] v4.2 双维度能力缺口分析（18 域 → 7 缺口）
+- [x] `plugins/必选扩展清单-v4.2.md` 输出
 
-## 待手动处理
-- [ ] 清理测试文件：`src/api/test_verify.py`、`tests/test_verify.py`（rm 命令被 Deny 阻止）
+## 待完成（确认后）
+- [ ] 用户确认 v4.2 清单
+- [ ] 第一阶段安装：E2B + Snyk Scanner
+- [ ] 第二阶段安装：GitHub MCP + Context7 + PostgreSQL MCP
+- [ ] 第三阶段安装：Brave Search MCP + Playwright MCP
+- [ ] 安装后验证（11 项清单）
+- [ ] 更新审计脚本适配 v4.2
 
 ## 阻塞项
-无
+无（等待用户确认）
 
 ## 下一步
-等待用户新任务
+用户确认 `plugins/必选扩展清单-v4.2.md` → 按三阶段安装 7 个 MCP
