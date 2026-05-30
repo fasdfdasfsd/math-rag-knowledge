@@ -4,8 +4,9 @@
 # ============================================================
 
 # === L3 项目本地（个人配置，禁止提交）===
-CLAUDE.local.md
-.claude/settings.local.json
+# 仅匹配项目根目录下的 L3 文件，config/L3 下的模板不受影响
+/CLAUDE.local.md
+/.claude/settings.local.json
 
 # === 密钥与凭证 ===
 .env
