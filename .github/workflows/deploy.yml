@@ -23,7 +23,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
         with: { python-version: "${{ env.PYTHON_VERSION }}" }
-      - run: uv sync --frozen
+      - run: uv sync --frozen --dev
       - run: uv run ruff check .
       - run: uv run mypy src/ --strict
 
@@ -48,7 +48,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
         with: { python-version: "${{ env.PYTHON_VERSION }}" }
-      - run: uv sync --frozen
+      - run: uv sync --frozen --dev
       - run: uv run pytest --cov=src --cov-report=xml --cov-fail-under=80
         env:
           DB_HOST: localhost
