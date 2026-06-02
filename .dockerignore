@@ -34,6 +34,7 @@ Thumbs.db
 # === 密钥与凭证（安全红线）===
 .env
 .env.*
+!.env.example
 *.pem
 *.key
 secrets/
@@ -61,8 +62,6 @@ knowledge/
 .pre-commit-config.yaml
 mypy.ini
 ruff.toml
-pyproject.toml
-uv.lock
 
 # === CI/CD 配置 ===
 scripts/
