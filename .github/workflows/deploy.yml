@@ -81,6 +81,9 @@ jobs:
     needs: [test, build-frontend]
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
