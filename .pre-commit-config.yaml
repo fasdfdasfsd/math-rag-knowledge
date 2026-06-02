@@ -1,0 +1,95 @@
+# .pre-commit-config.yaml — 数学冒险世界 质量门禁
+# 参见: CLAUDE.md §代码质量门禁
+# 安装: uv run pre-commit install
+# 手动触发: uv run pre-commit run --all-files
+
+repos:
+  # ── Ruff: 代码检查 + 格式化 ──
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.8.0
+    hooks:
+      # lint + fix（可修复的自动修复）
+      - id: ruff
+        name: ruff check
+        alias: ruff-check
+        args: [--fix, --exit-non-zero-on-fix]
+        types_or: [python, pyi]
+      # format 检查
+      - id: ruff-format
+        name: ruff format
+        alias: ruff-format
+        types_or: [python, pyi]
+
+  # ── mypy: 静态类型检查（strict 模式）──
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.13.0
+    hooks:
+      - id: mypy
+        name: mypy strict
+        alias: mypy-strict
+        args: ["--strict", "src/"]
+        # mypy 需要项目的依赖环境，用 additional_dependencies 注明
+        additional_dependencies:
+          - "pydantic>=2.10.0"
+          - "fastapi>=0.115.0"
+          - "sqlalchemy>=2.0.36"
+          - "structlog>=24.4.0"
+          - "redis>=5.2.0"
+          - "httpx>=0.28.0"
+        pass_filenames: false  # 整体检查 src/，而非逐个文件
+
+  # ── 密钥泄露检测 ──
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.5.0
+    hooks:
+      - id: detect-secrets
+        name: detect-private-key
+        alias: detect-secrets
+        args: ["--baseline", ".secrets.baseline"]
+        # 排除非密钥文件减少噪音
+        exclude: >
+          (?x)^(
+            .*\.lock|
+            .*\.json|
+            tests/.*|
+            docs/.*
+          )$
+
+  # ── 大文件拦截 ──
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-added-large-files
+        name: check-large-files
+        args: ["--maxkb=500"]
+      - id: trailing-whitespace
+        name: trim-trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
+      - id: end-of-file-fixer
+        name: fix-end-of-file
+
+  # ── Commitizen: Conventional Commits 校验 ──
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: v4.1.1
+    hooks:
+      - id: commitizen
+        name: check-conventional-commit
+        stages: [commit-msg]
+
+  # ── pip-audit: Python 依赖漏洞扫描 ──
+  - repo: https://github.com/pypa/pip-audit
+    rev: v2.7.3
+    hooks:
+      - id: pip-audit
+        name: pip-audit
+        args:
+          [
+            "--strict",
+            "--require-hashes",
+            "--skip-editable",
+            "-r",
+            "pyproject.toml",
+          ]
+        # pip-audit 要求 uv.lock 或 requirements 文件
+        # 这里作为 pre-commit 中的快速检查，完整检查在 CI
+        stages: [manual]  # 默认跳过，CI 中显式调用

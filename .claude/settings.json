@@ -3,18 +3,24 @@
     "allow": [
       "Bash(git *)",
       "Bash(uv *)",
+      "Bash(docker compose *)",
+      "Bash(docker *)",
       "Bash(python -m pytest *)",
       "Bash(python -m ruff *)",
       "Bash(python -m mypy *)",
-      "Bash(python deploy.py *)",
+      "Bash(python -m alembic *)",
+      "Bash(python *.py)",
       "Bash(mkdir *)",
       "Bash(ls *)",
       "Bash(cat *)",
       "Bash(find *)",
       "Bash(echo *)",
       "Bash(wc *)",
+      "Bash(du *)",
       "Bash(curl http://localhost:*)",
       "Bash(curl https://api.deepseek.com:*)",
+      "WebSearch",
+      "WebFetch",
       "Read(**)"
     ],
     "deny": [
@@ -65,14 +71,14 @@
         "matcher": "Edit",
         "hooks": [{
           "type": "command",
-          "command": "echo '[自动格式化] 跳过（ruff 未安装在当前环境）' && exit 0"
+          "command": "echo '[自动格式化] ruff format 跳过（按需手动执行）' && exit 0"
         }]
       },
       {
         "matcher": "Write",
         "hooks": [{
           "type": "command",
-          "command": "echo '[自动格式化] 跳过（ruff 未安装在当前环境）' && exit 0"
+          "command": "echo '[自动格式化] ruff format 跳过（按需手动执行）' && exit 0"
         }]
       }
     ],
@@ -112,7 +118,7 @@
       {
         "hooks": [{
           "type": "command",
-          "command": "echo '═══ 记忆文件状态 ═══' && for f in .claude/MEMORY.md .claude/primer.md .claude/activeContext.md CLAUDE.md; do [ -f \"$f\" ] && echo \"✅ $f\" || echo \"❌ $f (缺失)\"; done && echo '' && echo '═══ 项目健康检查 ═══' && [ -f .claude/.last-session-exit ] && echo '📅 上次退出: '$(cat .claude/.last-session-exit 2>/dev/null || echo 未知) || echo '⚠️ 未找到退出记录（可能异常退出）' && [ -f .pytest_cache/v/cache/lastfailed ] && echo '🧪 测试: ⚠️ 上次有失败用例' || echo '🧪 测试: 无失败缓存' && grep -c '避坑' .claude/MEMORY.md 2>/dev/null >/dev/null && echo '📝 避坑: MEMORY.md 中有未归类经验' || echo '📝 避坑: 无新增' && echo '══════════════════' && exit 0"
+          "command": "echo '' && echo '══════════════════════════════════════' && echo '  行为宪法已加载 (.claude/rules/behavior.md)' && echo '══════════════════════════════════════' && echo '  🔴 决策：选择题+推荐 | 不问\"是否继续\"' && echo '  🔴 无人值守：直接执行 | 不问确认' && echo '  🔴 上下文 ≥75%警告 ≥100%强制compact' && echo '  🔴 ≥3智能体共识后才汇报' && echo '  🔴 文档/知识库同步更新（不等用户提醒）' && echo '══════════════════════════════════════' && echo '' && echo '═══ 记忆文件状态 ═══' && for f in .claude/MEMORY.md .claude/primer.md .claude/activeContext.md CLAUDE.md .claude/rules/behavior.md .claude/rules/autonomous.md; do [ -f \"$f\" ] && echo \"✅ $f\" || echo \"❌ $f (缺失)\"; done && echo '' && echo '═══ 项目健康检查 ═══' && [ -f .claude/.last-session-exit ] && echo '📅 上次退出: '$(cat .claude/.last-session-exit 2>/dev/null || echo 未知) || echo '⚠️ 未找到退出记录（可能异常退出）' && [ -f .pytest_cache/v/cache/lastfailed ] && echo '🧪 测试: ⚠️ 上次有失败用例' || echo '🧪 测试: 无失败缓存' && echo '══════════════════' && exit 0"
         }]
       }
     ]

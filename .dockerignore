@@ -1,0 +1,80 @@
+# ============================================================
+# .dockerignore — 数学冒险世界
+# 排除构建上下文中不必要的文件，减小镜像体积
+# ============================================================
+
+# === Python 构建/缓存 ===
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+dist/
+build/
+*.so
+
+# === 虚拟环境 ===
+.venv/
+venv/
+
+# === 版本控制 ===
+.git/
+.gitignore
+.gitattributes
+.github/
+
+# === IDE 与编辑器 ===
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# === 密钥与凭证（安全红线）===
+.env
+.env.*
+*.pem
+*.key
+secrets/
+credentials.*
+*.cred
+
+# === Claude / AI 辅助配置 ===
+.claude/
+CLAUDE.md
+CLAUDE.local.md
+
+# === 测试 ===
+tests/
+.pytest_cache/
+htmlcov/
+.coverage
+*.sqlite3
+*.db
+
+# === 文档 & 知识库（运行时不需）===
+docs/
+knowledge/
+
+# === 本地开发配置 ===
+.pre-commit-config.yaml
+mypy.ini
+ruff.toml
+pyproject.toml
+uv.lock
+
+# === CI/CD 配置 ===
+scripts/
+
+# === 容器/编排 ===
+docker-compose.yml
+Dockerfile
+.dockerignore
+
+# === 杂项 ===
+*.log
+*.tmp
+.mypy_cache/
+.ruff_cache/
+.tox/

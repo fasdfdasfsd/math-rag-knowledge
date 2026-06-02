@@ -1,0 +1,128 @@
+# ============================================================
+# GitHub Actions CI Pipeline — 数学冒险世界
+# 版本: v1.0 (2026-06-01)
+# 触发: pull_request → main
+# 阶段: Lint → Test → Security
+#
+# 技术栈: Python 3.13 / uv / Ruff / mypy / pytest / pip-audit
+# 服务: PostgreSQL 16 / Redis 7
+# ============================================================
+
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+
+# 同一 PR 的新 push 自动取消正在运行的 CI
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYTHON_VERSION: "3.13"
+
+jobs:
+  # ============================================================
+  # Stage 1: Lint — 代码风格 + 类型安全
+  # ============================================================
+  lint:
+    name: "Stage 1: Lint"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install uv and Python ${{ env.PYTHON_VERSION }}
+        uses: astral-sh/setup-uv@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: uv sync --group dev
+
+      - name: ruff format check
+        run: uv run ruff format --check src/ tests/
+
+      - name: ruff lint check
+        run: uv run ruff check src/ tests/
+
+      - name: mypy strict
+        run: uv run mypy --strict src/
+
+  # ============================================================
+  # Stage 2: Test — 单元测试 + 覆盖率门禁
+  # ============================================================
+  test:
+    name: "Stage 2: Test"
+    needs: lint
+    runs-on: ubuntu-latest
+
+    # 外部服务依赖
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: mathrag
+          POSTGRES_PASSWORD: mathrag_dev
+          POSTGRES_DB: math_rag
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U mathrag -d math_rag"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install uv and Python ${{ env.PYTHON_VERSION }}
+        uses: astral-sh/setup-uv@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: uv sync --group dev
+
+      - name: Run tests with coverage
+        run: uv run pytest --cov=src --cov-fail-under=80 -v
+        env:
+          DATABASE_URL: postgresql+asyncpg://mathrag:mathrag_dev@localhost:5432/math_rag
+          REDIS_URL: redis://localhost:6379/0
+          PYTHONPATH: src
+
+  # ============================================================
+  # Stage 3: Security — 依赖漏洞扫描
+  # ============================================================
+  security:
+    name: "Stage 3: Security"
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install uv and Python ${{ env.PYTHON_VERSION }}
+        uses: astral-sh/setup-uv@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: uv sync --group dev
+
+      - name: Install pip-audit
+        run: uv pip install pip-audit
+
+      - name: pip-audit dependency scan
+        run: uv run pip-audit --strict --skip-editable

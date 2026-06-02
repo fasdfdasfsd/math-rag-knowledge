@@ -1,0 +1,201 @@
+# ============================================================
+# math-rag-knowledge / 数学冒险世界 开发环境 Docker Compose
+# 版本: v2.1 (2026-06-01)
+# 服务: Milvus + etcd + MinIO + PostgreSQL 16 + Redis 7 + Content Validation
+# 用法: docker compose up -d
+# 验证: docker compose ps && docker compose logs --tail=20
+# ============================================================
+
+services:
+  # ===== Milvus 向量数据库 =====
+  etcd:
+    container_name: math-rag-etcd
+    image: quay.io/coreos/etcd:v3.5.5
+    restart: unless-stopped
+    environment:
+      - ETCD_AUTO_COMPACTION_MODE=revision
+      - ETCD_AUTO_COMPACTION_RETENTION=1000
+      - ETCD_QUOTA_BACKEND_BYTES=4294967296
+      - ETCD_SNAPSHOT_COUNT=50000
+    volumes:
+      - etcd_data:/etcd
+    command: etcd -advertise-client-urls=http://127.0.0.1:2379 -listen-client-urls http://0.0.0.0:2379 --data-dir /etcd
+    healthcheck:
+      test: ["CMD", "etcdctl", "endpoint", "health"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+    networks:
+      - math-rag-net
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: "512M"
+
+  minio:
+    container_name: math-rag-minio
+    image: minio/minio:RELEASE.2025-04-08T15-58-15Z
+    restart: unless-stopped
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    volumes:
+      - minio_data:/minio_data
+    command: minio server /minio_data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    ports:
+      - "9001:9001"
+    networks:
+      - math-rag-net
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: "512M"
+
+  milvus:
+    container_name: math-rag-milvus
+    image: milvusdb/milvus:v2.5.4
+    restart: unless-stopped
+    command: ["milvus", "run", "standalone"]
+    security_opt:
+      - seccomp:unconfined
+    environment:
+      ETCD_ENDPOINTS: etcd:2379
+      MINIO_ADDRESS: minio:9000
+      MINIO_ACCESS_KEY_ID: minioadmin
+      MINIO_SECRET_ACCESS_KEY: minioadmin
+    volumes:
+      - milvus_data:/var/lib/milvus
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9091/healthz"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    ports:
+      - "19530:19530"
+      - "9091:9091"
+    depends_on:
+      etcd:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    networks:
+      - math-rag-net
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: "4G"
+
+  # ===== PostgreSQL 16 =====
+  postgres:
+    container_name: math-rag-postgres
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: mathrag
+      POSTGRES_PASSWORD: mathrag_dev
+      POSTGRES_DB: math_rag
+      # 时区
+      TZ: Asia/Shanghai
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mathrag -d math_rag"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    ports:
+      - "5432:5432"
+    networks:
+      - math-rag-net
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: "1G"
+
+  # ===== Redis 7 (RDB + AOF 双持久化) =====
+  redis:
+    container_name: math-rag-redis
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: >
+      redis-server
+      --appendonly yes
+      --appendfsync everysec
+      --auto-aof-rewrite-percentage 100
+      --auto-aof-rewrite-min-size 64mb
+      --save 900 1
+      --save 300 10
+      --save 60 10000
+      --requirepass mathrag_dev
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "mathrag_dev", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    ports:
+      - "6379:6379"
+    networks:
+      - math-rag-net
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: "512M"
+
+  # ===== Content Validation Service (ADR-SEC-006: 独立部署) =====
+  content-validation:
+    container_name: math-rag-content-validation
+    build:
+      context: ./docker/content-validation
+      dockerfile: Dockerfile
+    image: math-rag/content-validation:local
+    restart: unless-stopped
+    volumes: []
+    ports:
+      - "8010:8010"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - math-rag-net
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: "512M"
+
+volumes:
+  etcd_data:
+    name: math-rag-etcd-data
+  minio_data:
+    name: math-rag-minio-data
+  milvus_data:
+    name: math-rag-milvus-data
+  pgdata:
+    name: math-rag-pgdata
+  redis_data:
+    name: math-rag-redis-data
+
+networks:
+  math-rag-net:
+    name: math-rag-network
+    driver: bridge

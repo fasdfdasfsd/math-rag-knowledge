@@ -287,7 +287,51 @@ class BudgetMiddleware:
         return True
 ```
 
-## 参考来源
+## 进阶专题
+
+### Claude Code 内置监控命令
+
+| 命令 | 功能 | 输出 |
+|------|------|------|
+| `/cost` | 显示累计 token 和费用 | 按模型/会话分摊 |
+| `/context` | 显示 token 使用明细 | 彩色网格：系统/工具/MCP/对话 |
+| `/usage` | API 套餐上限和速率限制 (v2.1.70+) | 剩余额度/重置时间 |
+
+### 缓存命中率监控（SEV 级别）
+
+Anthropic 将缓存命中率当事故监控。应建立：
+
+```python
+# 每请求检查缓存效率
+ideal: cache_read_input_tokens >> input_tokens
+alert: cache_read_input_tokens / total_input < 0.5  # 低于 50% 命中率告警
+```
+
+优化后目标：**92%** 缓存命中率，有效成本仅无缓存的 **~16%**。
+
+### 三层成本优化体系
+
+| 层 | 机制 | 节省 |
+|:--:|------|:--:|
+| **Layer 1** | Anthropic 原生 prompt caching | 68% 命中 |
+| **Layer 2** | 语义缓存 (cosine ≥ 0.95 复用) | 15% 命中 |
+| **Layer 3** | 结果缓存 (Redis 智能 TTL) | 10% 命中 |
+
+三层叠加 → **93% 综合命中率**，月成本从 $47K → $2.8K。
+
+### 关键指标看板
+
+| 指标 | 目标 | 告警阈值 |
+|------|:--:|:--:|
+| 缓存命中率 | > 80% | < 50% |
+| 无效缓存写入 | < 5% | > 10% |
+| 模型降级率 (pro→sonnet) | < 20% | > 40% |
+| 单请求 token | < 10K | > 100K |
+| 月度预算使用率 | < 80% | > 90% |
+
+### 参考来源
 
 - [Anthropic API Usage](https://docs.anthropic.com/en/api/usage)
+- [Using Claude Code: session management and 1M context (2026.04)](https://claude.com/blog/using-claude-code-session-management-and-1m-context)
+- [How We Cut LLM API Costs by 94%: A 3-Layer Caching Strategy — dev.to](https://dev.to/anilatambharii/how-we-cut-llm-api-costs-by-94-a-3-layer-caching-strategy-145l)
 - [tiktoken 官方文档](https://github.com/openai/tiktoken)

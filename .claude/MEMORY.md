@@ -1,65 +1,91 @@
 ---
-name: session-2026-05-30-v4.2-planning
-description: v4.1 安装审计 → 安全加固 → 双维度能力分析 → v4.2 必选扩展清单
+name: session-2026-06-01-final
+description: 2026-06-01 全天会话 — 阶段 0-10 全部完成，项目交付就绪
 metadata:
-  type: project
-  session_date: 2026-05-30
+  type: session_memory
+  session_date: 2026-06-01
 ---
 
-# 会话记忆 — 2026-05-30（v4.1 审计 + v4.2 规划）
+# 会话记忆 — 2026-06-01（最终状态）
 
-## 完成事项
+## 整体进度
 
-### 1. v4.1 安装审计（6 问题修复）
-- 方案文档 Hook 数量 7→9（补充 Notification ×2）
-- config/README.md + config/L2/README.md 数字同步（Hook 8→9, knowledge 66→82）
-- **创建 .gitignore**（关键：L3 文件无保护）
-- **创建 config/L2/.claudeignore 模板** + 部署脚本自动修复
-- PostToolUse matcher+if 修复（`Edit|Write`+`if` → 拆分为 Edit / Write 两个独立条目）
-- 避坑 #12 归档
+- **11 阶段流程**：阶段 0-10 全部完成 ✅
+- **整体进度**：100%（按阶段加权）
+- **16 次多智能体部署**（7 批次）
+- **22 份设计文档**
 
-### 2. 安全加固
-- **L3 Bash(*) 发现并移除**（用户指正 — 完全绕过 L2 安全模型）
-- L3 恢复为仅 WebSearch + WebFetch 域限制
-- Git 初始化：4 次提交，118 文件
-- .gitignore 修复：`/CLAUDE.local.md` 仅匹配根目录，避免误伤 config/L3 模板
+## 代码产出
 
-### 3. 自动化验证体系
-- `scripts/audit_v4.1.py` — 610 检查项静态审计（100% 通过）
-- `scripts/func_test_v4.1.py` — 50 项功能测试（100% 通过）
-- 避坑 #13 归档（L3 Bash(*)）
-- 避坑汇总 10→12 条
+| 层级 | 文件数 | 状态 |
+|------|--------|------|
+| 后端 Python | 52 个 | mypy strict 零错误 |
+| 前端 TypeScript/TSX | 25 个 | TypeScript 零错误 |
+| 测试 | 239 个 | 229 unit + 10 integration |
+| 基础设施 | Docker 5/6 healthy | PG+Redis+Milvus 正常 |
 
-### 4. v4.2 第三方扩展规划
-- 双维度分析：生命周期轴（9 阶段）+ 基础能力域（9 域）= 18 能力域
-- v4.1 + Claude Code 内置覆盖 11 域，真实缺口 7 个
-- 排除 7 个"看似有用不填补缺口"的工具
-- 输出 `plugins/必选扩展清单-v4.2.md`（365 行，待用户确认后安装）
+## 关键架构决策（ADR）
 
-### 5. v4.2 必选 7 项
+见 `.claude/primer.md` — ADR-001 至 ADR-015 + ADR-SEC-001 至 SEC-006
 
-| # | 必选项 | 填补缺口 | 许可 | 费用 |
-|---|--------|------|:--:|:--:|
-| 1 | E2B | 测试沙箱 + 代码安全 | Apache 2.0 | 免费 |
-| 2 | GitHub MCP | CI/CD 协作中枢 | MIT | 免费 |
-| 3 | Context7 | 实时库文档 | MIT | 免费 |
-| 4 | Snyk Scanner | 自动化安全扫描 | Apache 2.0 | 免费 |
-| 5 | PostgreSQL MCP | 数据库操作能力 | MIT | 免费 |
-| 6 | Brave Search MCP | Web 技术搜索 | MPL 2.0 | 免费 |
-| 7 | Playwright MCP | 浏览器自动化 | Apache 2.0 | 免费 |
+核心决策：
+- 三层解耦架构（Decision Engine → RAG → LLM）
+- 模块化单体（非微服务）
+- PostgreSQL 关系表存知识图谱
+- LLMProvider ABC + 工厂模式（运行时热切换）
+- 段落级 SSE 流式推送
+- Pre/Post-LLM 双端内容安全审核
 
-## 重要决策
-- 选型方法论：先定义能力缺口，再选工具填补（而非先选工具再找理由）
-- L3 权限原则：不放任何 Bash 权限，所有 Bash 控制在 L2 统一管理
-- 三不选原则：v4.1 已覆盖不选、Claude Code 内置不选、当前阶段不需要不选
-- 四层架构扩展：新增"扫描层"（Snyk，不入 L1/L2/L3，独立守护）
+## 避坑记录
 
-## 避坑新增
-12. PostToolUse `Edit|Write` + `if` 不可靠（同 #9 家族 — `|` 属于工具名字符集，`if` 可能被忽略）
-13. L3 `Bash(*)` 覆盖 L2 全部安全模型（部署时临时加入，事后忘记移除）
+1. **DEEPSEEK_BASE_URL 双 /v1**：配置默认值 `https://api.deepseek.com/v1` 但 OpenAI SDK 自动追加 `/v1`，导致 404。修正为 `https://api.deepseek.com`。`.env` 需手动修改或使用启动脚本覆盖。
+2. **passlib 与 bcrypt≥4.1 不兼容**：passlib 依赖 `bcrypt.__about__` 属性（bcrypt 4.1+ 已移除）。迁移到原生 bcrypt API。
+3. **EventSource 不支持自定义 Header**：SSE 认证改用 fetch + ReadableStream 手动解析。
+4. **Docker 镜像仓库全部不可用**：通过缓存镜像版本标记绕过。
+5. **上下文溢出**：达到 567k/200k（283%），加强上下文监控规则并写入 CLAUDE.md。
 
-## 下次会话
-1. 用户确认 `plugins/必选扩展清单-v4.2.md`
-2. 按三阶段安装 7 个 MCP
-3. 安装后验证（11 项清单）
-4. 更新 v4.1 审计脚本适配 v4.2
+## 唯一阻塞项
+
+- `.env` 文件 `DEEPSEEK_BASE_URL` 需从 `https://api.deepseek.com/v1` 改为 `https://api.deepseek.com`（去掉 `/v1`）
+- 启动脚本 `scripts/dev.ps1` 和 `scripts/start-dev.sh` 已自动覆盖此变量
+
+## 产品治理红线
+
+- `docs/产品治理规则-数学冒险世界-v1.md` — 70+ 条规则，6 大领域
+- 4 层执行：Pre-LLM 消毒 → System Prompt 硬约束 → Post-LLM 审核 → 人工抽检
+- 3 级管控：🔴 代码阻断 / 🟡 Post-LLM 验证 / 🟢 人工抽检
+
+## 上下文监控规则（已写入 CLAUDE.md）
+
+- R1: ≥75% 警告
+- R2: ≥100% 立即 compact
+- R3: ≥200% 保存恢复点 + compact（丢失关键信息视为事故）
+- 每次回复前自检
+
+## 行为宪法（2026-06-02 落定）
+
+用户反复强调的核心要求已写入三层配置，每次会话自动加载：
+
+| 文件 | 层级 | 内容 |
+|------|------|------|
+| `.claude/rules/behavior.md` | 项目规则 | 4 条红线：决策协议/无人值守/上下文监控/共识优先 |
+| `.claude/rules/autonomous.md` | 项目规则 | 禁止词汇表 + 替代表达 + 执行节奏 |
+| `CLAUDE.md` 顶部引用 | 项目指令 | 启动即见的行为宪法链接 |
+| `~/.claude/CLAUDE.md` 顶部引用 | 全局指令 | 所有项目生效的决策+值守+监控规则 |
+| `.claude/settings.json` SessionStart | Hook | 启动时打印行为宪法摘要 |
+
+**这些规则现在已固化到配置文件中，下次打开 Claude Code 自动生效。**
+
+## 下次会话启动
+
+```bash
+# 启动后端
+uv run uvicorn src.main:app --port 8000 --reload
+
+# 启动前端（另一个终端）
+cd frontend && npm run dev
+
+# 或一键启动
+.\scripts\dev.ps1   # Windows
+bash scripts/start-dev.sh  # Unix
+```

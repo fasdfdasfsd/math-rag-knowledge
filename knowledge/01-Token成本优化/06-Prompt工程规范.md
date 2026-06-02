@@ -77,8 +77,76 @@ enforced_by:
 | 角色设定 | 需要特定视角 | "你是一个安全审计专家" |
 | 反例提示 | 常见错误模式 | "不要用 X，因为会导致 Y" |
 
-## 四、评估与迭代
+## 四、缓存感知的 Prompt 设计
+
+### 前缀稳定原则
+
+Prompt 缓存基于前缀匹配——从第一个 token 开始逐字节比对。**任何变化都导致从变化点起全部失效**。
+
+```
+✅ 静态内容在前  →  System Prompt → Tools → CLAUDE.md
+✅ 动态内容在后  →  会话历史 → 用户最新消息
+❌ 时间戳在静态区 →  每次请求前缀不同 → 0% 命中
+❌ 工具顺序随机  →  不同请求前缀不同 → 0% 命中
+```
+
+### 用消息而非编辑来更新动态信息
+
+```
+❌ 修改 system prompt 加"现在是 15:30"→ 缓存全失
+✅ 在 user message 末尾加 <system-reminder>现在是 15:30</system-reminder>
+```
+
+### CLAUDE.md 设计原则
+
+来自 Anthropic 官方建议：
+
+| 原则 | 说明 |
+|------|------|
+| **≤ 50 行, ~2,000 tokens** | 作为索引而非完整文档 |
+| **不包含动态内容** | 无日期、无本周计划、无变化的值 |
+| **指向详细信息位置** | `config: config/index.ts` 而非贴完整配置 |
+| **可被压缩后重新加载** | Compaction 后从磁盘重新读取 |
+
+```markdown
+# ✅ 好的 CLAUDE.md
+## Key Commands
+- install: pnpm install
+- test: pnpm test
+
+## Code Conventions
+- TypeScript strict mode
+- API routes in src/api/
+
+## Key Files
+- Config: config/index.ts
+- Schema: prisma/schema.prisma
+
+## Don't Do
+- Don't modify .env.production
+```
+
+### 压缩安全提示
+
+在 CLAUDE.md 中加入压缩引导：
+
+```markdown
+# Compact Instructions
+When compacting, preserve:
+- Modified file paths + line numbers
+- Test results (pass/fail)
+- Active TODO items
+- Error messages and stack traces
+```
+
+## 五、评估与迭代
 
 - A/B 测试：同一任务用不同 prompt，比较产出质量
 - 记录 prompt 性能：token 消耗、产出质量、迭代次数
 - 失败的 prompt 也是知识：记录到避坑汇总
+- **监控缓存命中率**：prompt 结构变更必须检查是否破坏缓存前缀
+
+## 参考来源
+
+- [Lessons from building Claude Code: Prompt caching is everything (2026.04)](https://claude.com/blog/lessons-from-building-claude-code-prompt-caching-is-everything)
+- [Claude Code Prompt Cache 深度解析 — 阿里云 (2026.05)](https://developer.aliyun.com/article/1732421)

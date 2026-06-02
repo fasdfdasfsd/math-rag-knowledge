@@ -234,7 +234,42 @@ SET hnsw.ef_search = 50;  -- HNSW ef_search 参数
 """
 ```
 
-## 参考来源
+## 进阶专题
+
+### RAG 系统中的 Embedding 缓存层次
+
+```
+Layer 1: 内存 LRU 缓存 (最近 1000 条)
+Layer 2: Redis 持久化缓存 (TTL 7 天)
+Layer 3: PostgreSQL 永久存储 (向量 + 元数据)
+```
+
+### 缓存 TTL 建议
+
+| 数据类型 | TTL | 原因 |
+|------|:--:|------|
+| 用户查询 embedding | 1 小时 | 相同问题短时间重复 |
+| 文档 chunk embedding | 永久 | 文档内容不变则向量不变 |
+| 会话级临时向量 | 会话结束 | 一次性检索场景 |
+
+### 维度选择决策矩阵
+
+| 场景 | 推荐维度 | 存储 (1000万条) | 查询速度 |
+|------|:--:|:--:|:--:|
+| 大规模文档检索 | 768 | ~29GB | 4×(基准) |
+| 通用 RAG | 1536 | ~58GB | 1×(基准) |
+| 高精度语义搜索 | 3072 | ~115GB | 0.25× |
+
+> 原则：在满足精度需求的前提下选择最低维度。
+
+### 批量处理最佳实践
+
+- 最小 batch：100 条
+- 最优 batch：200-500 条
+- 超大 batch 风险：超时、截断
+- 异步后台处理，不在请求链路同步等待
+
+### 参考来源
 
 - [OpenAI Embedding API 文档](https://platform.openai.com/docs/guides/embeddings)
 - [pgvector 官方文档](https://github.com/pgvector/pgvector)
