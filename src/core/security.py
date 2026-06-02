@@ -2,10 +2,9 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 import bcrypt
-
 from jose import JWTError, jwt
 
 from src.core.config import get_settings
@@ -51,8 +50,8 @@ def create_access_token(
         "type": "access",
         "iss": "math-adventure-backend",
         "aud": "math-adventure-api",
-        "iat": datetime.now(timezone.utc),
-        "exp": datetime.now(timezone.utc)
+        "iat": datetime.now(UTC),
+        "exp": datetime.now(UTC)
         + (expires_delta or timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)),
     }
     private_key = _load_private_key(settings.JWT_PRIVATE_KEY)
@@ -65,8 +64,8 @@ def create_refresh_token(user_id: str) -> str:
     to_encode = {
         "sub": user_id,
         "type": "refresh",
-        "iat": datetime.now(timezone.utc),
-        "exp": datetime.now(timezone.utc)
+        "iat": datetime.now(UTC),
+        "exp": datetime.now(UTC)
         + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS),
     }
     private_key = _load_private_key(settings.JWT_PRIVATE_KEY)

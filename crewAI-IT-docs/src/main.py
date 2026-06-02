@@ -13,20 +13,23 @@
 """
 import argparse
 import os
+from pathlib import Path
 import re
 import sys
 import time
-from pathlib import Path
 
 # 确保 src 目录在 sys.path 中，支持直接运行
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from dotenv import load_dotenv
-from crewai import Crew, Process
 from agents import (
-    requirement_analyst, system_architect, technical_writer,
-    claude_code_reviewer, ecc_controller
+    claude_code_reviewer,
+    ecc_controller,
+    requirement_analyst,
+    system_architect,
+    technical_writer,
 )
+from crewai import Crew, Process
+from dotenv import load_dotenv
 from tasks import get_tasks
 from utils.logger import setup_logger
 
@@ -146,7 +149,7 @@ def run_crew(
                 break  # 成功跳出重试循环
 
             except Exception as e:
-                logger.error(f"尝试 {attempt} 失败：{str(e)}", exc_info=True)
+                logger.error(f"尝试 {attempt} 失败：{e!s}", exc_info=True)
                 if attempt == max_retries:
                     logger.error("已达最大重试次数。")
                     raise

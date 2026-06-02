@@ -12,14 +12,15 @@
   - ecc (变更控制员)       → DeepSeek V3（温度 0.1）
 """
 import os
-from typing import Dict, Any
+from typing import Any
+
 from crewai import LLM
 
 # ============================================================
 # 角色-模型配置映射表
 # 修改此处即可全局切换模型，无需改动 agents.py
 # ============================================================
-ROLE_MODEL_MAP: Dict[str, Dict[str, Any]] = {
+ROLE_MODEL_MAP: dict[str, dict[str, Any]] = {
     "analyst": {
         "model": "deepseek/deepseek-chat",
         "temperature": 0.4,         # 略高温度，鼓励发散思维和假设推断

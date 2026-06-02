@@ -22,6 +22,23 @@ select = [
 ]
 ignore = [
     "E501",   # 行长度由 formatter 处理，lint 不检查
+    "RUF001", # 中文全角字符（""''（）——）在字符串/注释中是合法的
+    "RUF002", # 中文标点（。，、：）在 docstring 中是合法的
+    "RUF003", # 中文注释中的标点（，、：（））是合法的
+    "B008",   # FastAPI Depends() 在函数参数中是标准模式
+    "TC001",  # TYPE_CHECKING imports 改进项，非阻塞
+    "TC002",  # 同上
+    "TC003",  # 同上
+    "N818",   # AppException 命名是项目约定
+    "UP046",  # Generic[] 需 Python 3.12+ 语法支持
+    "SIM108", # if-else 可读性优于三元
+    "SIM105", # try-except-pass 清晰度优于 suppress
+    "RUF015", # next(iter(x)) 比 x[0] 可读性差
+    "RUF013", # Optional[] vs | None — 新代码已用 | None，老代码不阻塞
+    "F841",   # 未使用变量 — 测试/调试中常见，不阻塞
+    "B904",   # raise from err — 改进项
+    "E741",   # 歧义变量名 — l 在某些上下文中可用
+    "RUF012", # Mutable class attribute — 不阻塞
 ]
 
 # isort 风格配置

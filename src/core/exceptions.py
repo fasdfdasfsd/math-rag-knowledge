@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any
 
 
 class AppException(Exception):
@@ -15,7 +15,7 @@ class AppException(Exception):
         self,
         message: str,
         status_code: int = 500,
-        detail: Optional[dict[str, Any]] = None,
+        detail: dict[str, Any] | None = None,
     ) -> None:
         self.message = message
         self.status_code = status_code
@@ -37,7 +37,7 @@ class NotFoundException(AppException):
 class ValidationException(AppException):
     """参数校验异常 (422)。"""
 
-    def __init__(self, message: str, errors: Optional[list[dict]] = None) -> None:
+    def __init__(self, message: str, errors: list[dict] | None = None) -> None:
         super().__init__(
             message=message,
             status_code=422,

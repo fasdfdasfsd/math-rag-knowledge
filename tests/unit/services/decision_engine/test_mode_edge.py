@@ -2,19 +2,16 @@
 
 from __future__ import annotations
 
-import pytest
-
 from src.services.decision_engine.mode_router import (
     AdventureMode,
     ModeRouter,
-    MAX_CONSECUTIVE_SAME_MODE,
 )
 
 
 class TestModeDistribution:
     async def test_3_1_1_ratio_approximate(self) -> None:
         router = ModeRouter()
-        counts = {m: 0 for m in AdventureMode}
+        counts = dict.fromkeys(AdventureMode, 0)
         for i in range(500):
             mode = await router.route(f"user_{i}")
             counts[mode] += 1

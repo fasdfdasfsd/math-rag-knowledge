@@ -2,16 +2,13 @@
 
 from __future__ import annotations
 
-from datetime import datetime
-from typing import List, Optional
-
 from pydantic import BaseModel, Field
 
 
 class LevelStartRequest(BaseModel):
     """开始关卡请求。"""
     level_id: str
-    mode: Optional[str] = None
+    mode: str | None = None
 
 
 class LevelStartResponse(BaseModel):
@@ -19,10 +16,10 @@ class LevelStartResponse(BaseModel):
     level_id: str
     title: str
     description: str
-    npc_dialogue: Optional[str] = None
+    npc_dialogue: str | None = None
     question: str
     difficulty: int
-    hints: List[str] = Field(default_factory=list)
+    hints: list[str] = Field(default_factory=list)
 
 
 class AnswerSubmitRequest(BaseModel):
@@ -38,7 +35,7 @@ class AnswerSubmitResponse(BaseModel):
     score: float
     stars: int
     explanation: str
-    next_level_id: Optional[str] = None
+    next_level_id: str | None = None
 
 
 class LevelBrief(BaseModel):

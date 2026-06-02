@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import AsyncGenerator
+from collections.abc import AsyncGenerator
 
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
@@ -19,7 +19,7 @@ _async_session_maker = None
 
 async def init_db(settings: Settings) -> None:
     """初始化数据库连接池。"""
-    global _engine, _async_session_maker  # noqa: PLW0603
+    global _engine, _async_session_maker
 
     _engine = create_async_engine(
         settings.db_url,
@@ -39,7 +39,7 @@ async def init_db(settings: Settings) -> None:
 
 async def shutdown_db(settings: Settings) -> None:
     """关闭数据库连接池。"""
-    global _engine, _async_session_maker  # noqa: PLW0603
+    global _engine, _async_session_maker
 
     if _engine:
         await _engine.dispose()

@@ -2,22 +2,20 @@
 
 from __future__ import annotations
 
-import pytest
 from pydantic import ValidationError
+import pytest
 
-from src.models.schemas.common import DataResponse, ErrorDetail, PaginationParams, Page
 from src.models.schemas.adventure import (
-    LevelStartRequest,
-    LevelStartResponse,
     AnswerSubmitRequest,
-    AnswerSubmitResponse,
     LevelBrief,
+    LevelStartRequest,
 )
+from src.models.schemas.common import DataResponse, ErrorDetail, Page, PaginationParams
 from src.models.schemas.npc import NPCBrief, NPCDialogueResponse
 from src.models.schemas.parent import (
     ChildProgress,
-    ParentDashboardResponse,
     DataManagementRequest,
+    ParentDashboardResponse,
 )
 
 

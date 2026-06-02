@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
+import pytest
 
-from src.core.middleware import register_middleware
 from src.core.exceptions import AppException, NotFoundException
+from src.core.middleware import register_middleware
 
 
 @pytest.fixture

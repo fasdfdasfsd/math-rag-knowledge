@@ -2,18 +2,15 @@
 
 from __future__ import annotations
 
-from unittest.mock import AsyncMock, MagicMock, patch
-
-import pytest
+from unittest.mock import AsyncMock, MagicMock
 
 from src.services.llm_generation.llm_provider import (
+    DeepSeekProvider,
     LLMContext,
     LLMMessage,
     LLMResponse,
-    LLMProvider,
-    TokenUsage,
     StreamChunk,
-    DeepSeekProvider,
+    TokenUsage,
 )
 
 

@@ -3,9 +3,7 @@
 from __future__ import annotations
 
 import asyncio
-from typing import AsyncIterator
-
-import pytest
+from collections.abc import AsyncIterator
 
 from src.services.llm_generation.stream_manager import (
     SSE_HEARTBEAT_INTERVAL,

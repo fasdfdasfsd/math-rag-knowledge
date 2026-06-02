@@ -11,15 +11,15 @@ from __future__ import annotations
 import pytest
 
 from src.core.config import get_settings
+from src.services.content_validation.forbidden_phrase_checker import (
+    ForbiddenPhraseChecker,
+)
 from src.services.llm_generation.prompt_assembler import PromptAssembler
 from src.services.rag_constraint.constraint_assembler import (
     ConstraintContext,
     DefaultConstraintAssembler,
 )
 from src.services.rag_constraint.memory_assembler import MemoryAssembler
-from src.services.content_validation.forbidden_phrase_checker import (
-    ForbiddenPhraseChecker,
-)
 
 pytestmark = pytest.mark.integration
 

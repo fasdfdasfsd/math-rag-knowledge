@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import asyncio
+from collections.abc import AsyncIterator
 import json
-from typing import AsyncIterator
 
 from fastapi.responses import StreamingResponse
 
@@ -54,10 +54,10 @@ class StreamManager:
                 # 全部段落完成
                 yield f"event: complete\ndata: {{\"session_id\": \"{level_id}\", \"segments\": {segment_index}}}\n\n"
 
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 yield f"event: error\ndata: {{\"error\": \"timeout\", \"segments_done\": {segment_index}}}\n\n"
             except Exception as exc:
-                yield f"event: error\ndata: {{\"error\": \"{str(exc)}\", \"segments_done\": {segment_index}}}\n\n"
+                yield f"event: error\ndata: {{\"error\": \"{exc!s}\", \"segments_done\": {segment_index}}}\n\n"
 
         return StreamingResponse(
             event_generator(),

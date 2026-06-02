@@ -10,13 +10,16 @@
   4. ECC 任务末尾输出结构化评分标记，供 main.py 的质量迭代逻辑解析。
   5. 知识库工具和全局记忆工具按需注入，不影响默认流程。
 """
-from crewai import Task
 from agents import (
-    requirement_analyst, system_architect, technical_writer,
-    claude_code_reviewer, ecc_controller
+    claude_code_reviewer,
+    ecc_controller,
+    requirement_analyst,
+    system_architect,
+    technical_writer,
 )
-from tools.knowledge_base import KnowledgeBaseTool
+from crewai import Task
 from tools.global_memory import GlobalMemoryTool
+from tools.knowledge_base import KnowledgeBaseTool
 
 
 def get_tasks(knowledge_dir: str = None, memory_file: str = None):

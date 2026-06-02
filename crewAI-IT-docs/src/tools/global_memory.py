@@ -10,7 +10,7 @@
 """
 import json
 from pathlib import Path
-from typing import Type
+
 from crewai.tools import BaseTool
 from pydantic import BaseModel, Field
 
@@ -25,7 +25,7 @@ class GlobalMemoryInput(BaseModel):
 class GlobalMemoryTool(BaseTool):
     name: str = "global_memory"
     description: str = "读写全局共享记忆，可用于存储项目偏好、历史决策等。"
-    args_schema: Type[BaseModel] = GlobalMemoryInput
+    args_schema: type[BaseModel] = GlobalMemoryInput
 
     memory_file: str = ""
 

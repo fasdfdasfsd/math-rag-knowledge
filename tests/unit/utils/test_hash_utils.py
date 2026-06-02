@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from src.utils.hash_utils import content_checksum, audit_hash
+from src.utils.hash_utils import audit_hash, content_checksum
 
 
 def test_content_checksum_deterministic() -> None:

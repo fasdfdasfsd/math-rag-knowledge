@@ -11,12 +11,12 @@ from src.services.decision_engine.difficulty_calculator import (
     SlidingWindowCalculator,
     get_difficulty_calculator,
 )
-from src.services.decision_engine.mode_router import AdventureMode, ModeRouter
+from src.services.decision_engine.knowledge_selector import KnowledgeSelector
+from src.services.decision_engine.mode_router import ModeRouter
 from src.services.decision_engine.progress_state_machine import (
     LevelState,
     ProgressStateMachine,
 )
-from src.services.decision_engine.knowledge_selector import KnowledgeSelector
 
 
 class TestDifficultyEdgeCases:

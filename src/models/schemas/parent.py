@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import List, Optional
-
 from pydantic import BaseModel, Field
 
 
@@ -17,13 +15,13 @@ class ChildProgress(BaseModel):
     average_score: float
     current_world: str
     current_chapter: str
-    struggling_concepts: List[str]
-    mastered_concepts: List[str]
+    struggling_concepts: list[str]
+    mastered_concepts: list[str]
 
 
 class ParentDashboardResponse(BaseModel):
     """家长仪表盘响应。"""
-    children: List[ChildProgress]
+    children: list[ChildProgress]
     weekly_active_days: int
     total_learning_hours: float
 
@@ -32,4 +30,4 @@ class DataManagementRequest(BaseModel):
     """数据管理请求。"""
     action: str = Field(..., pattern="^(export|delete|download_report)$")
     user_id: str
-    date_range: Optional[str] = None
+    date_range: str | None = None

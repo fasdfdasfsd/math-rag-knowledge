@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Optional
-
 from pydantic import BaseModel
 
 
@@ -12,7 +10,7 @@ class NPCBrief(BaseModel):
     id: str
     name: str
     role: str
-    avatar_url: Optional[str] = None
+    avatar_url: str | None = None
 
 
 class NPCDialogueResponse(BaseModel):

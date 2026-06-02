@@ -5,8 +5,8 @@ from __future__ import annotations
 import pytest
 
 from src.services.security.rate_limiter import (
-    InMemoryRateLimiter,
     RATE_LIMITS,
+    InMemoryRateLimiter,
     get_rate_limiter,
 )
 

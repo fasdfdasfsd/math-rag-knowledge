@@ -5,7 +5,6 @@ from __future__ import annotations
 import pytest
 
 from src.services.decision_engine.mode_router import (
-    MAX_CONSECUTIVE_SAME_MODE,
     AdventureMode,
     ModeRouter,
 )

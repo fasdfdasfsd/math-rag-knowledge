@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Generic, List, Optional, TypeVar
+from typing import Generic, TypeVar
 
 from pydantic import BaseModel, Field
 
@@ -16,7 +16,7 @@ class ErrorDetail(BaseModel):
     status: int
     detail: str
     trace_id: str = Field(default="", description="请求追踪 ID")
-    instance: Optional[str] = None
+    instance: str | None = None
 
 
 class DataResponse(BaseModel, Generic[T]):
@@ -39,7 +39,7 @@ class PaginationParams(BaseModel):
 
 class Page(BaseModel, Generic[T]):
     """分页响应。"""
-    items: List[T]
+    items: list[T]
     total: int
     page: int
     page_size: int

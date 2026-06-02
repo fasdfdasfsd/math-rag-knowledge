@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import pytest
 
-from src.services.content_validation.forbidden_phrase_checker import ForbiddenPhraseChecker
+from src.services.content_validation.forbidden_phrase_checker import (
+    ForbiddenPhraseChecker,
+)
 
 
 @pytest.fixture

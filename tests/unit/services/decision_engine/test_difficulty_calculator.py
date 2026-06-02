@@ -8,8 +8,6 @@ from __future__ import annotations
 import pytest
 
 from src.services.decision_engine.difficulty_calculator import (
-    CONSECUTIVE_ERROR_THRESHOLD,
-    SWEET_SPOT_HIGH,
     SWEET_SPOT_LOW,
     DifficultyContext,
     DifficultyLevel,

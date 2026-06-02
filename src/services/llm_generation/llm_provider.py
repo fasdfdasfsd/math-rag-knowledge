@@ -11,8 +11,9 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from collections.abc import AsyncIterator
 from dataclasses import dataclass, field
-from typing import Any, AsyncIterator, Dict, List, Optional
+from typing import Any
 
 from pydantic import BaseModel
 
@@ -27,10 +28,10 @@ class LLMMessage(BaseModel):
 class LLMContext:
     """LLM 调用上下文。"""
     system_prompt: str
-    messages: List[LLMMessage]
+    messages: list[LLMMessage]
     temperature: float = 0.7
     max_tokens: int = 2048
-    model_params: Dict[str, Any] = field(default_factory=dict)
+    model_params: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -61,7 +62,7 @@ class StreamChunk:
     content: str
     is_last: bool = False
     index: int = 0
-    usage: Optional[TokenUsage] = None
+    usage: TokenUsage | None = None
     finish_reason: str | None = None
 
 

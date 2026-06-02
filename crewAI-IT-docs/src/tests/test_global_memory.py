@@ -1,8 +1,9 @@
 """
 全局记忆工具单元测试
 """
-import tempfile
 import os
+import tempfile
+
 from src.tools.global_memory import GlobalMemoryTool
 
 

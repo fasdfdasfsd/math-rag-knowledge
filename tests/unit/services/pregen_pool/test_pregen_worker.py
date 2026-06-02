@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import pytest
-
 from src.services.pregen_pool.level_pregen_worker import LevelPregenWorker
 
 

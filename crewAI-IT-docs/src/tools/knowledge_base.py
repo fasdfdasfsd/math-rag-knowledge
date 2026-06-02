@@ -7,7 +7,7 @@
 检索策略：按段落（\n\n 分隔）匹配任意关键词，最多返回 3 条结果。
 """
 from pathlib import Path
-from typing import Type
+
 from crewai.tools import BaseTool
 from pydantic import BaseModel, Field
 
@@ -20,7 +20,7 @@ class KnowledgeBaseInput(BaseModel):
 class KnowledgeBaseTool(BaseTool):
     name: str = "knowledge_base"
     description: str = "检索本地知识库中的 Markdown/TXT 文件内容。"
-    args_schema: Type[BaseModel] = KnowledgeBaseInput
+    args_schema: type[BaseModel] = KnowledgeBaseInput
 
     knowledge_dir: str = ""
 

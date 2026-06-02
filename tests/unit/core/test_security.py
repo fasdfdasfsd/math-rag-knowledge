@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import pytest
 
-from src.core.security import hash_password, verify_password, verify_resource_ownership
 from src.core.exceptions import ForbiddenException
+from src.core.security import hash_password, verify_password, verify_resource_ownership
 
 
 class TestPasswordHashing:

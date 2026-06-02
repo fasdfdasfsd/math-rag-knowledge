@@ -2,10 +2,9 @@
 
 from __future__ import annotations
 
-import json
+from collections.abc import Awaitable, Callable
 import time
 import uuid
-from typing import Awaitable, Callable
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware

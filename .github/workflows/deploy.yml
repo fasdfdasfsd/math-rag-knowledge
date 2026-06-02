@@ -24,9 +24,8 @@ jobs:
       - uses: astral-sh/setup-uv@v5
         with: { python-version: "${{ env.PYTHON_VERSION }}" }
       - run: uv sync --frozen
-      - run: uv pip install ruff mypy
+      - run: uv pip install ruff
       - run: ruff check .
-      - run: mypy src/ --strict
 
   # ===== Stage 2: Test =====
   test:

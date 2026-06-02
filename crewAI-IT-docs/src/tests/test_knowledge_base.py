@@ -1,8 +1,9 @@
 """
 知识库工具单元测试
 """
-import tempfile
 from pathlib import Path
+import tempfile
+
 from src.tools.knowledge_base import KnowledgeBaseTool
 
 
